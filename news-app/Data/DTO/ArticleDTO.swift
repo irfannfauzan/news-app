@@ -1,5 +1,5 @@
 //
-//  NewsListDTO.swift
+//  ArticleDTO.swift
 //  news-app
 //
 //  Created by Vokal-Ican on 06/11/26.
@@ -36,6 +36,12 @@ struct ArticleSourceDTO: Decodable {
     let name: String?
 }
 
+struct NewsAPIErrorDTO: Decodable {
+    let status: String?
+    let code: String?
+    let message: String?
+}
+
 // MARK: - Mapping
 
 extension ArticleSourceDTO {
@@ -45,6 +51,8 @@ extension ArticleSourceDTO {
 }
 
 extension ArticleDTO {
+    private static let isoFormatter = ISO8601DateFormatter()
+
     func toDomain() -> Article? {
         guard let title, let url = url.flatMap(URL.init(string:)) else {
             return nil
@@ -57,7 +65,7 @@ extension ArticleDTO {
             description: description ?? "",
             url: url,
             urlImage: urlImage.flatMap(URL.init(string:)),
-            publishedAt: publishedAt.flatMap { ISO8601DateFormatter().date(from: $0) },
+            publishedAt: publishedAt.flatMap { Self.isoFormatter.date(from: $0) },  
             content: content ?? ""
         )
     }
