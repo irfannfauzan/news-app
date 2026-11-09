@@ -1,5 +1,5 @@
 //
-//  NewsList.swift
+//  Article.swift
 //  news-app
 //
 //  Created by Vokal-Ican on 06/11/26.
