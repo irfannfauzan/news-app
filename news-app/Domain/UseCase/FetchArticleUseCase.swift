@@ -12,7 +12,7 @@ final class FetchArticleUseCase {
         self.repository = repository
     }
     
-    func execute() async throws -> [Article] {
+    func execute() async throws -> ArticleFeed {
         try await repository.fetchArticle()
     }
 }

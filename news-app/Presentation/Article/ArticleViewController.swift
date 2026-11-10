@@ -122,6 +122,14 @@ class ArticleViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+    
+    private let lastUpdatedLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 12, weight: .regular)
+        label.textColor = AppColors.textPrimary
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
 
     // MARK: - Lifecycle
 
@@ -131,6 +139,7 @@ class ArticleViewController: UIViewController {
         setupAppbar()
         setupLayout()
         bindViewModel()
+        observeForeground()
 
         Task {
             await viewModel.loadArticles()
@@ -145,6 +154,7 @@ class ArticleViewController: UIViewController {
         view.addSubview(articleTableView)
         view.addSubview(loadingIndicator)
         view.addSubview(messageLabel)
+        view.addSubview(lastUpdatedLabel)
         articleTableView.refreshControl = refreshControl
 
         NSLayoutConstraint.activate([
@@ -156,8 +166,12 @@ class ArticleViewController: UIViewController {
             headlineLabel.topAnchor.constraint(equalTo: sourceCollectionView.bottomAnchor, constant: 24),
             headlineLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             headlineLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            lastUpdatedLabel.topAnchor.constraint(equalTo: headlineLabel.bottomAnchor, constant: 24),
+            lastUpdatedLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            lastUpdatedLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
 
-            articleTableView.topAnchor.constraint(equalTo: headlineLabel.bottomAnchor, constant: 8),
+            articleTableView.topAnchor.constraint(equalTo: lastUpdatedLabel.bottomAnchor, constant: 8),
             articleTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             articleTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             articleTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -195,6 +209,7 @@ class ArticleViewController: UIViewController {
     }
 
     private func render(_ state: ArticleState) {
+        updateLastUpdatedLabel()
         switch state {
         case .loading:
             if !refreshControl.isRefreshing {
@@ -240,6 +255,22 @@ class ArticleViewController: UIViewController {
         Task {
             await viewModel.loadArticles()
         }
+    }
+    
+    private func observeForeground() {
+        NotificationCenter.default.addObserver(self, selector: #selector(appWillEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+    }
+    
+    @objc private func appWillEnterForeground() {
+        updateLastUpdatedLabel()
+        Task {
+            await viewModel.refreshIfNeeded()
+        }
+    }
+    
+    private func updateLastUpdatedLabel() {
+        lastUpdatedLabel.text = viewModel.lastUpdatedText
+        lastUpdatedLabel.textColor = viewModel.isOffline ? .systemOrange : AppColors.secondTextPrimary
     }
 }
 

@@ -6,5 +6,5 @@
 //
 
 protocol ArticleRepositoryProtocol {
-    func fetchArticle() async throws -> [Article]
+    func fetchArticle() async throws -> ArticleFeed
 }

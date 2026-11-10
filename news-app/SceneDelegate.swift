@@ -19,7 +19,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowScene)
         let apiClient = APIClient()
-        let repository = ArticleRepository(apiClient: apiClient)
+        let cache  = ArticleFileCache()
+        let repository = ArticleRepository(apiClient: apiClient, cache: cache)
         let useCase = FetchArticleUseCase(repository: repository)
         let viewModel = ArticleViewModel(fetchArticle: useCase)
         let viewController = ArticleViewController(viewModel: viewModel)

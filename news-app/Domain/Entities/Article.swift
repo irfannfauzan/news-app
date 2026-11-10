@@ -9,12 +9,12 @@ import Foundation
 
 // MARK: - Entities
 
-struct ArticleSource {
+struct ArticleSource: Codable {
     let id: String?
     let name: String
 }
 
-struct Article {
+struct Article: Codable {
     let source: ArticleSource
     let author: String
     let title: String
@@ -23,4 +23,10 @@ struct Article {
     let urlImage: URL?
     let publishedAt: Date?
     let content: String
+}
+
+struct ArticleFeed {
+    let articles: [Article]
+    let updatedAt: Date
+    let isOffline: Bool
 }
